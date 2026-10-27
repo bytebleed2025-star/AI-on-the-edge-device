@@ -775,11 +775,49 @@ string toLower(string in)
 }
 
 // CPU Temp
+#ifdef CONFIG_IDF_TARGET_ESP32
 extern "C" uint8_t temprature_sens_read();
 float temperatureRead()
 {
 	return (temprature_sens_read() - 32) / 1.8;
 }
+#else
+// ESP32-S3 and newer do not have the ROM function above; use the IDF driver.
+// The sensor is installed on first use (thread safe static init) and kept on.
+#include "driver/temperature_sensor.h"
+
+float temperatureRead()
+{
+	static temperature_sensor_handle_t tsens = []() -> temperature_sensor_handle_t {
+		temperature_sensor_handle_t handle = NULL;
+		temperature_sensor_config_t cfg = TEMPERATURE_SENSOR_CONFIG_DEFAULT(-10, 80);
+
+		if (temperature_sensor_install(&cfg, &handle) != ESP_OK)
+		{
+			return NULL;
+		}
+		if (temperature_sensor_enable(handle) != ESP_OK)
+		{
+			temperature_sensor_uninstall(handle);
+			return NULL;
+		}
+		return handle;
+	}();
+
+	if (tsens == NULL)
+	{
+		return -1; // sensor not available
+	}
+
+	float celsius = 0;
+	if (temperature_sensor_get_celsius(tsens, &celsius) != ESP_OK)
+	{
+		return -1;
+	}
+
+	return celsius;
+}
+#endif
 
 time_t addDays(time_t startTime, int days)
 {

@@ -18,9 +18,17 @@ if ("${GIT_REV}" STREQUAL "")
     set(GIT_TAG "N/A")
     set(GIT_BRANCH "N/A")
 else()
+    # Do not use "bash -c" here: on Windows without WSL the bash stub prints an
+    # error message into the output and corrupts version.cpp.
     execute_process(
-        COMMAND bash -c "git diff --quiet --exit-code || echo +"
-        OUTPUT_VARIABLE GIT_DIFF)
+        COMMAND git diff --quiet --exit-code
+        RESULT_VARIABLE GIT_DIRTY
+        OUTPUT_QUIET ERROR_QUIET)
+    if (GIT_DIRTY)
+        set(GIT_DIFF "+")
+    else()
+        set(GIT_DIFF "")
+    endif()
     execute_process(
         COMMAND git describe --exact-match --tags
         OUTPUT_VARIABLE GIT_TAG ERROR_QUIET)

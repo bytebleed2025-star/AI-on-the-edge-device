@@ -1,0 +1,38 @@
+# Last-wins overrides for [env:esp32s3-wroom-cam]
+#
+# The CMakeLists.txt applies this file *after* sdkconfig.defaults, so the
+# settings below win over the generic (ESP32) defaults.
+# Board: ESP32-S3-WROOM-1 N16R8 (16 MB QIO flash + 8 MB OPI PSRAM)
+
+# --- Flash / partitions -----------------------------------------------------
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="16MB"
+CONFIG_ESPTOOLPY_FLASHSIZE_DETECT=n
+# CONFIG_ESPTOOLPY_FLASHSIZE_4MB is not set
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions_s3_16mb.csv"
+CONFIG_PARTITION_TABLE_FILENAME="partitions_s3_16mb.csv"
+
+# --- CPU --------------------------------------------------------------------
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+# CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_160 is not set
+CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y
+# CONFIG_ESP32S3_DEFAULT_CPU_FREQ_160 is not set
+
+# --- PSRAM (octal, 8 MB on R8 modules) --------------------------------------
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_TYPE_AUTO=y
+CONFIG_SPIRAM_SPEED_80M=y
+# CONFIG_SPIRAM_SPEED_40M is not set
+CONFIG_SPIRAM_BOOT_INIT=y
+CONFIG_SPIRAM_USE_MALLOC=y
+# keep =y during bring-up: the device still boots (and logs) if PSRAM is bad
+CONFIG_SPIRAM_IGNORE_NOTFOUND=y
+
+# --- Camera modules sold with this board ------------------------------------
+CONFIG_OV2640_SUPPORT=y
+CONFIG_OV3660_SUPPORT=y
+CONFIG_OV5640_SUPPORT=y
+
+# --- Not used on this board -------------------------------------------------
+# CONFIG_ETH_SPI_ETHERNET_W5500 is not set

@@ -1,0 +1,27 @@
+[LoRa]
+; Copy this file to the root of the SD card and rename it to lora.ini
+; All values are optional - the built-in defaults are shown here.
+
+enabled         = true
+
+; --- radio (must match lora-master/include/config.h) ---
+frequency       = 433000000     ; Hz
+spreading_factor = 9            ; 6..12
+bandwidth       = 125000        ; Hz
+coding_rate     = 5             ; 5 = 4/5 ... 8 = 4/8
+tx_power        = 17            ; dBm, 2..20 (RA-02: 20 is the absolute max)
+sync_word       = 0x12          ; private LoRa network
+preamble        = 8
+
+; --- link ---
+ack             = true
+ack_timeout_ms  = 1500
+retries         = 2
+
+; --- wiring (ESP32-S3-WROOM N16R8 CAM) ---
+pin_sck         = 14
+pin_miso        = 21
+pin_mosi        = 41
+pin_nss         = 42
+pin_reset       = 47
+pin_dio0        = -1            ; -1 = not wired, IRQ flags are polled

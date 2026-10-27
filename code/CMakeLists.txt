@@ -18,5 +18,16 @@ if(EXISTS "${SDKCONFIG}.defaults")
     message(STATUS "-- Using defaults: ${SDKCONFIG_DEFAULTS}")
 endif()
 
+# Optional board specific overrides, applied last (highest priority):
+# sdkconfig.<env>.override, e.g. sdkconfig.esp32s3-wroom-cam.override
+if(EXISTS "${SDKCONFIG}.override")
+    if(SDKCONFIG_DEFAULTS)
+        set(SDKCONFIG_DEFAULTS "${SDKCONFIG_DEFAULTS};${SDKCONFIG}.override")
+    else()
+        set(SDKCONFIG_DEFAULTS "sdkconfig.defaults;${SDKCONFIG}.override")
+    endif()
+    message(STATUS "-- Using board overrides: ${SDKCONFIG}.override")
+endif()
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(AI-on-the-edge)

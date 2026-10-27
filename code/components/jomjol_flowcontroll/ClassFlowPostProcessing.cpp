@@ -14,6 +14,10 @@
 #include "../../include/defines.h"
 #include "Helper.h"
 
+#ifdef ENABLE_LORA
+#include "lora_link.h"
+#endif // ENABLE_LORA
+
 static const char* TAG = "POSTPROC";
 
 std::string ClassFlowPostProcessing::getNumbersName() {
@@ -988,6 +992,25 @@ bool ClassFlowPostProcessing::doFlow(string zwtime) {
         LogFile.WriteToFile(ESP_LOG_INFO, TAG, _zw);
         WriteDataLog(j);
     }
+
+    #ifdef ENABLE_LORA
+        // Forward the accepted reading(s) to the LoRa master (see components/jomjol_lora).
+        // Only values that passed the post processing are sent; an empty value means
+        // the round had an error and there is nothing to report.
+        if (LoRaLink_IsReady())
+        {
+            for (int j = 0; j < NUMBERS.size(); ++j)
+            {
+                if (NUMBERS[j]->ReturnValue.empty())
+                    continue;
+
+                LoRaLink_SendReading(NUMBERS[j]->name.c_str(),
+                                     NUMBERS[j]->ReturnValue.c_str(),
+                                     (uint32_t)NUMBERS[j]->timeStampLastValue,
+                                     NUMBERS[j]->ErrorMessageText != "no error");
+            }
+        }
+    #endif // ENABLE_LORA
 
     SavePreValue();
     return true;

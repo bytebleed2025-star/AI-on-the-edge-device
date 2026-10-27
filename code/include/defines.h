@@ -310,6 +310,45 @@
     #define FLASH_GPIO GPIO_NUM_4               // PIN for flashlight LED
     #define USE_PWM_LEDFLASH                    // if __LEDGLOBAL is defined, a global variable is used for LED control, otherwise locally and each time a new
 
+#elif defined(BOARD_ESP32_S3_WROOM_CAM) // ESP32-S3-WROOM-1 N16R8 CAM module (OV2640 / OV5640 / OV3660)
+    // Generic "ESP32-S3-CAM" layout (Waveshare / Freenove style clones).
+    // If camera or SD card are not detected, verify these pins against the
+    // schematic of your board (see hardware-test/README.md how to check).
+
+	// SD card (operated with SDMMC peripheral, 1-line mode)
+	//-------------------------------------------------
+	#define GPIO_SDCARD_CLK GPIO_NUM_39
+	#define GPIO_SDCARD_CMD GPIO_NUM_38
+	#define GPIO_SDCARD_D0  GPIO_NUM_40
+	#define GPIO_SDCARD_D1  GPIO_NUM_NC
+	#define GPIO_SDCARD_D2  GPIO_NUM_NC
+	#define GPIO_SDCARD_D3  GPIO_NUM_NC
+
+    #define CAM_PIN_PWDN     GPIO_NUM_NC
+    #define CAM_PIN_RESET    GPIO_NUM_NC  //software reset will be performed
+    #define CAM_PIN_XCLK     GPIO_NUM_15
+    #define CAM_PIN_SIOD     GPIO_NUM_4
+    #define CAM_PIN_SIOC     GPIO_NUM_5
+
+    #define CAM_PIN_D7       GPIO_NUM_16
+    #define CAM_PIN_D6       GPIO_NUM_17
+    #define CAM_PIN_D5       GPIO_NUM_18
+    #define CAM_PIN_D4       GPIO_NUM_12
+    #define CAM_PIN_D3       GPIO_NUM_10
+    #define CAM_PIN_D2       GPIO_NUM_8
+    #define CAM_PIN_D1       GPIO_NUM_9
+    #define CAM_PIN_D0       GPIO_NUM_11
+    #define CAM_PIN_VSYNC    GPIO_NUM_6
+    #define CAM_PIN_HREF     GPIO_NUM_7
+    #define CAM_PIN_PCLK     GPIO_NUM_13
+
+    //Statusled + ClassControllCamera
+    #define BLINK_GPIO GPIO_NUM_2               // PIN for the board LED (if present)
+	
+    //ClassControllCamera
+    #define FLASH_GPIO GPIO_NUM_2               // PIN for flashlight LED (illumination)
+    #define USE_PWM_LEDFLASH                    // if __LEDGLOBAL is defined, a global variable is used for LED control, otherwise locally and each time a new
+
 #else
     #error "Board not selected"
 #endif  //Board PIN Map

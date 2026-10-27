@@ -36,6 +36,10 @@
 #include "statusled.h"
 #include "sdcard_check.h"
 
+#ifdef ENABLE_LORA
+#include "lora_link.h"
+#endif // ENABLE_LORA
+
 #include "../../include/defines.h"
 
 #ifdef ENABLE_SOFTAP
@@ -160,7 +164,11 @@ bool Init_NVS_SDCard()
     // dies führt jedoch bei schlechten Kopien des AI_THINKER Boards
     // zu Problemen mit der SD Initialisierung und eventuell sogar zur reboot-loops.
     // Um diese Probleme zu kompensieren, wird der PullUp manuel gesetzt.
-    gpio_set_pull_mode(GPIO_SDCARD_D3, GPIO_PULLUP_ONLY); // HS2_D3
+    // Boards without a D3 line (1-line mode, D3 = NC) must skip this.
+    if (GPIO_SDCARD_D3 != GPIO_NUM_NC)
+    {
+        gpio_set_pull_mode(GPIO_SDCARD_D3, GPIO_PULLUP_ONLY); // HS2_D3
+    }
 
     // Options for mounting the filesystem.
     // If format_if_mount_failed is set to true, SD card will be partitioned and
@@ -279,6 +287,21 @@ extern "C" void app_main(void)
     MakeDir("/sdcard/img_tmp");      // mandatory for setting up alignment marks
     MakeDir("/sdcard/demo");         // mandatory for demo mode
     MakeDir("/sdcard/config/certs"); // mandatory for mqtt certificates
+
+    // LoRa slave (meter -> master link)
+    // Reads its configuration from /sdcard/lora.ini, does not block the boot
+    // when no radio module is connected.
+    // ********************************************
+    #ifdef ENABLE_LORA
+    if (LoRaLink_Init())
+    {
+        LogFile.WriteToFile(ESP_LOG_INFO, TAG, "LoRa slave initialized, readings will be sent to the master");
+    }
+    else
+    {
+        LogFile.WriteToFile(ESP_LOG_WARN, TAG, "LoRa slave not available (module missing or /sdcard/lora.ini disabled)");
+    }
+    #endif // ENABLE_LORA
 
     // Check for updates
     // ********************************************
